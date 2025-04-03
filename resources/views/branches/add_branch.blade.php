@@ -71,8 +71,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Working Hours -->
-                                    <div class="col-md-12">
+                                   <div class="col-md-12">
                                         <div class="form-group">
                                             <h4>Working Hours:</h4>
                                             <div id="working-hours-container">
@@ -87,7 +86,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Hidden Input for Schedule -->
+                                    <!-- Hidden Input to Store JSON Schedule -->
                                     <input type="hidden" name="schedule" id="schedule_input">
                                 </div>
 
@@ -109,61 +108,94 @@
 
 @section('page-script')
 <script>
-   document.addEventListener("DOMContentLoaded", function () {
-    let schedule = {};
+document.addEventListener("DOMContentLoaded", function () {
+    let schedule = {}; 
 
+    console.log("Script is running!"); // Debugging step 1
+
+    // Function to add a new time slot for a specific day
     document.querySelectorAll('.add-time-slot').forEach(button => {
         button.addEventListener('click', function () {
             let day = this.getAttribute('data-day');
             let container = document.getElementById('slots-' + day);
 
+            console.log(`Adding time slot for ${day}`); // Debugging step 2
+
+            // Create a unique ID for new input fields
+            let uniqueID = Date.now();
+
+            // Create new slot inputs
             let slotDiv = document.createElement('div');
-            slotDiv.classList.add('time-slot-entry');
+            slotDiv.classList.add('time-slot-entry', 'mt-2');
+            slotDiv.setAttribute('data-slot-id', uniqueID);
             slotDiv.innerHTML = `
-                <input type="time" class="start-time" required> to 
-                <input type="time" class="end-time" required>
+                <input type="time" class="start-time" name="start-time-${uniqueID}" required> to 
+                <input type="time" class="end-time" name="end-time-${uniqueID}" required>
                 <button type="button" class="btn btn-sm btn-danger remove-slot">X</button>
             `;
 
             container.appendChild(slotDiv);
-            updateSchedule();
+            updateSchedule(); // Ensure data updates
         });
     });
 
-    // Event delegation for removing slots
+    // Remove a time slot when clicking "X"
     document.body.addEventListener('click', function (event) {
         if (event.target.classList.contains('remove-slot')) {
-            event.target.parentNode.remove();
-            updateSchedule();
+            let parentDiv = event.target.closest('.time-slot-entry');
+            parentDiv.remove();
+            updateSchedule(); // Ensure data updates
         }
     });
 
+    // Function to update schedule data before form submission
     function updateSchedule() {
-        schedule = {};
+        schedule = {}; // Reset the schedule object
+        console.log("Updating schedule..."); // Debugging step 3
+
         document.querySelectorAll('.time-slots').forEach(container => {
             let day = container.id.replace('slots-', '');
             let slots = [];
 
             container.querySelectorAll('.time-slot-entry').forEach(slot => {
-                let startTime = slot.querySelector('.start-time').value;
-                let endTime = slot.querySelector('.end-time').value;
-                if (startTime && endTime) {
+                let startTimeInput = slot.querySelector('.start-time');
+                let endTimeInput = slot.querySelector('.end-time');
+
+                let startTime = startTimeInput.value;
+                let endTime = endTimeInput.value;
+
+                console.log(`Slot detected for ${day}: ${startTime} - ${endTime}`); // Debugging step 4
+
+                if (startTime && endTime && startTime < endTime) {
                     slots.push({ start: startTime, end: endTime });
                 }
             });
 
-            if (slots.length) {
+            if (slots.length > 0) {
                 schedule[day] = slots;
             }
         });
 
-        document.getElementById('schedule_input').value = JSON.stringify(schedule);
+        let scheduleJSON = JSON.stringify(schedule);
+        console.log("Final schedule JSON:", scheduleJSON); // Debugging step 5
+        document.getElementById('schedule_input').value = scheduleJSON;
     }
 
-    // Ensure schedule is updated before form submission
+    // Ensure schedule updates before form submission
     document.querySelector('form').addEventListener('submit', function () {
         updateSchedule();
+        console.log("Submitting Schedule:", document.getElementById('schedule_input').value);
+    });
+
+    // Bind change event for dynamically added inputs
+    document.body.addEventListener('change', function (event) {
+        if (event.target.classList.contains('start-time') || event.target.classList.contains('end-time')) {
+            updateSchedule();
+        }
     });
 });
+
+
+
 </script>
 @endsection

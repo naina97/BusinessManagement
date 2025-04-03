@@ -68,9 +68,8 @@ class BranchController extends Controller
     
             // Store image paths as comma-separated values
             $branch->images = implode(',', $imagePaths);
-            $branch->schedule = json_decode($request->schedule, true); 
-            $branch->exceptions = $request->exceptions ? json_decode($request->exceptions, true) : null;
-    
+            $branch->schedule = $request->schedule; 
+            $branch->exceptions = $request->exceptions;
     
             if ($branch->save()) {
                 return redirect()->route('branches.index')->with('success', 'Branch added successfully!');
