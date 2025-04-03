@@ -111,7 +111,6 @@ class BranchController extends Controller
                 }
             }
         }
-    
         return view('branches.show', compact('branch', 'schedule', 'exceptions', 'isOpen'));
     
     }

@@ -17,8 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('business_id')->nullable();
             $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
             $table->longText('images')->nullable();
-            $table->json('schedule'); // Store working hours as JSON
-            $table->json('exceptions')->nullable(); // Store specific available/unavailable dates
+            $table->json('schedule'); 
+            $table->json('exceptions')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

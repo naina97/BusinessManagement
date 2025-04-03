@@ -29,24 +29,28 @@
                <div class="col-12 col-sm-12">
                     <div class="card">
                         <div class="card-body">
-                                   <a href="{{ route('businesses.index') }}" class="btn btn-secondary mb-3">Back</a>
+                                   <a href="{{ route('branches.index') }}" class="btn btn-secondary mb-3">Back</a>
 
                                     <h3>Branch: {{ $branch->name }}</h3>
                                     <p>Business: {{ $branch->business->name }}</p>
 
                                     <h4>Operating Hours:</h4>
                                     <ul>
-                                        @foreach ($branch->schedule as $day => $times)
-                                            <li><strong>{{ $day }}:</strong>
-                                                @if(empty($times))
-                                                    Closed
-                                                @else
-                                                    @foreach ($times as $time)
-                                                        {{ $time['start'] }} - {{ $time['end'] }}
-                                                    @endforeach
-                                                @endif
-                                            </li>
-                                        @endforeach
+                                        @if(!empty($schedule) && is_array($schedule))
+                                            @foreach ($schedule as $day => $times)
+                                                <li><strong>{{ ucfirst($day) }}:</strong>
+                                                    @if(empty($times))
+                                                        Closed
+                                                    @else
+                                                        @foreach ($times as $time)
+                                                            {{ $time['start'] }} - {{ $time['end'] }}
+                                                        @endforeach
+                                                    @endif
+                                                </li>
+                                            @endforeach
+                                        @else
+                                            <li>No working hours available</li>
+                                        @endif
                                     </ul>
                                     <h4>Current Status:</h4>
                                     <span class="badge {{ $isOpen ? 'bg-success' : 'bg-danger' }}">
